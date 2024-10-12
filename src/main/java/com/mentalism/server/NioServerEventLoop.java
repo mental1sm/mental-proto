@@ -34,11 +34,10 @@ public class NioServerEventLoop implements Runnable {
             running = false;
             for (SelectionKey key : selector.keys()) {
                 if (key.isValid()) {
-                    AttributedSocketChannel client = new AttributedSocketChannel((SocketChannel) key.channel());
-                    ChannelHandlerContext ctx = new ChannelHandlerContext(client);
-                    ChannelPipeline pipeline = pipelineHolder.createPipeline();
-                    pipeline.fireChannelClose(ctx);
-                    client.close();
+                    ChannelHandlerContext ctx = (ChannelHandlerContext) key.attachment();
+                    ctx.getPipeline().reset();
+                    ctx.getPipeline().fireChannelClose(ctx);
+                    ctx.close();
                 }
             }
             selector.close();
@@ -78,8 +77,14 @@ public class NioServerEventLoop implements Runnable {
             System.out.println("Accepted connection from " + client.getRemoteAddress());
             client.configureBlocking(false);
             client.register(selector, SelectionKey.OP_READ);
-            ChannelHandlerContext ctx = new ChannelHandlerContext(new AttributedSocketChannel(client));
+            AttributedSocketChannel attributedClient = new AttributedSocketChannel(client);
+            ChannelHandlerContext ctx = new ChannelHandlerContext(attributedClient);
             ChannelPipeline pipeline = pipelineHolder.createPipeline();
+            ctx.setPipeline(pipeline);
+
+            // Bound to key of selector
+            client.keyFor(selector).attach(ctx);
+            pipeline.reset();
             pipeline.fireChannelOpen(ctx);
         } else {
             System.out.println("No client to accept, accept returned null");
@@ -87,16 +92,15 @@ public class NioServerEventLoop implements Runnable {
     }
 
     private void handleRead(SelectionKey key) throws IOException {
-        AttributedSocketChannel client = new AttributedSocketChannel((SocketChannel) key.channel());
+        ChannelHandlerContext ctx = (ChannelHandlerContext) key.attachment();
+        AttributedSocketChannel client = ctx.getChannel();
         ByteBuffer buffer = ByteBuffer.allocate(1024);
         int bytesRead = client.read(buffer);
 
         if (bytesRead == -1) {
             System.out.println("Connection closed by client: " + client.getRemoteAddress());
-            ChannelPipeline pipeline = pipelineHolder.createPipeline();
-            ChannelHandlerContext ctx = new ChannelHandlerContext(client);
-            ctx.setPipeline(pipeline);
-            pipeline.fireChannelClose(ctx);
+            ctx.getPipeline().reset();
+            ctx.getPipeline().fireChannelClose(ctx);
             client.close();
             return;
         }
@@ -104,10 +108,8 @@ public class NioServerEventLoop implements Runnable {
         if (bytesRead > 0) {
             buffer.flip();
             String message = new String(buffer.array(), 0, bytesRead);
-            ChannelPipeline pipeline = pipelineHolder.createPipeline();
-            ChannelHandlerContext ctx = new ChannelHandlerContext(client);
-            ctx.setPipeline(pipeline);
-            pipeline.fireChannelRead(ctx, message);
+            ctx.getPipeline().reset();
+            ctx.getPipeline().fireChannelRead(ctx, message);
         }
     }
 

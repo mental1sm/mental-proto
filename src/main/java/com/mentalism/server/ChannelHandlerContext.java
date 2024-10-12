@@ -6,8 +6,8 @@ import lombok.Setter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+@Getter
 public class ChannelHandlerContext {
-    @Getter
     private final AttributedSocketChannel channel;
     @Setter
     private ChannelPipeline pipeline;
