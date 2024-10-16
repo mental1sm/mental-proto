@@ -74,7 +74,6 @@ public class NioServerEventLoop implements Runnable {
         ServerSocketChannel server = (ServerSocketChannel) key.channel();
         SocketChannel client = server.accept();
         if (client != null) {
-            System.out.println("Accepted connection from " + client.getRemoteAddress());
             client.configureBlocking(false);
             client.register(selector, SelectionKey.OP_READ);
             AttributedSocketChannel attributedClient = new AttributedSocketChannel(client);
@@ -86,8 +85,6 @@ public class NioServerEventLoop implements Runnable {
             client.keyFor(selector).attach(ctx);
             pipeline.reset();
             pipeline.fireChannelOpen(ctx);
-        } else {
-            System.out.println("No client to accept, accept returned null");
         }
     }
 

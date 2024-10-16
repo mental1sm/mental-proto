@@ -1,7 +1,6 @@
 package com.mentalism.server;
 
 public class ProtoServer {
-    private static ProtoServer instance;
     private final NioServerEventLoop eventLoop;
 
     public ProtoServer(NioServerEventLoop eventLoop) {

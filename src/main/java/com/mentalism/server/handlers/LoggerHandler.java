@@ -10,6 +10,7 @@ public class LoggerHandler extends InboundChannelHandlerAdapter {
     public void channelOpen(ChannelHandlerContext ctx) {
         try {
             System.out.println("Logger: [OPENED] -> " + ctx.getChannel().getRemoteAddress());
+            ctx.fireChannelOpen();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -26,6 +27,7 @@ public class LoggerHandler extends InboundChannelHandlerAdapter {
     public void channelClose(ChannelHandlerContext ctx) {
         try {
             System.out.println("Logger: [CLOSED] -> " + ctx.getChannel().getRemoteAddress());
+            ctx.fireChannelClose();
         } catch (IOException e) {
             e.printStackTrace();
         }

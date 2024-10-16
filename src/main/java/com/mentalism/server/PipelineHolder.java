@@ -8,7 +8,7 @@ public class PipelineHolder {
 
 
     @SafeVarargs
-    public PipelineHolder(Class<? extends ChannelHandler>... handlerClasses) {
+    public PipelineHolder(Class<? extends ChannelHandler> ...handlerClasses) {
         this.handlerClasses = handlerClasses;
     }
 
