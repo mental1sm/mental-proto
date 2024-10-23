@@ -1,4 +1,7 @@
-package com.mentalism.server;
+package com.mentalism.server.pipeline;
+
+import com.mentalism.server.handlers.ChannelHandler;
+import com.mentalism.server.channel.ChannelHandlerContext;
 
 public class ChannelPipeline {
     private final ChannelHandler[] handlers;

@@ -1,5 +1,11 @@
 package com.mentalism.server;
 
+import com.mentalism.server.channel.AttributedSocketChannel;
+import com.mentalism.server.channel.ChannelHandlerContext;
+import com.mentalism.server.pipeline.ChannelPipeline;
+import com.mentalism.server.pipeline.PipelineHolder;
+import lombok.Setter;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -13,23 +19,24 @@ import java.util.Iterator;
 public class NioServerEventLoop implements Runnable {
     private final Selector selector;
     private boolean running = true;
-    private final PipelineHolder pipelineHolder;
+    @Setter
+    private PipelineHolder pipelineHolder;
+    @Setter
+    private int port;
 
-    public NioServerEventLoop(PipelineHolder pipelineHolder) throws IOException {
+    public NioServerEventLoop() throws IOException {
         this.selector = SelectorProvider.provider().openSelector();
-        this.pipelineHolder = pipelineHolder;
-        initServer();
-
     }
 
-    private void initServer() throws IOException {
+    public void initServer() throws IOException {
         ServerSocketChannel serverSocket = ServerSocketChannel.open();
-        serverSocket.socket().bind(new InetSocketAddress("127.0.0.1", 8888));
+        serverSocket.socket().bind(new InetSocketAddress("127.0.0.1", port));
         serverSocket.configureBlocking(false);
         serverSocket.register(selector, SelectionKey.OP_ACCEPT);
     }
 
     public void stop() {
+        System.out.println("STOP SIGNAL");
         try {
             running = false;
             for (SelectionKey key : selector.keys()) {
@@ -41,6 +48,7 @@ public class NioServerEventLoop implements Runnable {
                 }
             }
             selector.close();
+            System.out.println("CLOSED");
         }
         catch (IOException e) {
             throw new RuntimeException(e);
@@ -50,6 +58,7 @@ public class NioServerEventLoop implements Runnable {
     @Override
     public void run() {
         try {
+            initServer();
             System.out.println("Server was started!");
             while (running) {
                 selector.select();
@@ -66,7 +75,7 @@ public class NioServerEventLoop implements Runnable {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 

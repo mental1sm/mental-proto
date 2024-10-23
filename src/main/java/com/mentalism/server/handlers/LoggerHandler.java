@@ -1,7 +1,6 @@
 package com.mentalism.server.handlers;
 
-import com.mentalism.server.ChannelHandlerContext;
-import com.mentalism.server.InboundChannelHandlerAdapter;
+import com.mentalism.server.channel.ChannelHandlerContext;
 
 import java.io.IOException;
 

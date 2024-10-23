@@ -1,5 +1,7 @@
-package com.mentalism.server;
+package com.mentalism.server.handlers;
 
+
+import com.mentalism.server.channel.ChannelHandlerContext;
 
 public abstract class InboundChannelHandlerAdapter implements ChannelHandler {
     @Override

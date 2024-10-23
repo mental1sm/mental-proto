@@ -1,4 +1,4 @@
-package com.mentalism.server;
+package com.mentalism.server.channel;
 
 import java.io.IOException;
 import java.net.Socket;

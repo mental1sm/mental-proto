@@ -1,5 +1,6 @@
-package com.mentalism.server;
+package com.mentalism.server.channel;
 
+import com.mentalism.server.pipeline.ChannelPipeline;
 import lombok.Getter;
 import lombok.Setter;
 

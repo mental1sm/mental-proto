@@ -1,16 +1,15 @@
-package com.mentalism.server;
+package com.mentalism.server.pipeline;
+import com.mentalism.server.handlers.ChannelHandler;
+
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PipelineHolder {
-    private final Class<? extends ChannelHandler>[] handlerClasses;
+    private final ArrayList<Class<? extends ChannelHandler>> handlerClasses = new ArrayList<>();
 
 
-    @SafeVarargs
-    public PipelineHolder(Class<? extends ChannelHandler> ...handlerClasses) {
-        this.handlerClasses = handlerClasses;
-    }
+    public PipelineHolder() {}
 
     public ChannelPipeline createPipeline() {
         List<ChannelHandler> handlers = new ArrayList<>();
@@ -26,5 +25,10 @@ public class PipelineHolder {
         }
 
         return new ChannelPipeline(handlers.toArray(new ChannelHandler[0]));
+    }
+
+    public PipelineHolder addLast(Class<? extends ChannelHandler> handlerClass) {
+        handlerClasses.add(handlerClass);
+        return this;
     }
 }
